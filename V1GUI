@@ -10,7 +10,6 @@ local correctKey = "1234"
 local flySpeed = 50
 local flying = false
 local bv, bg
-local dragging = false
 local minSpeed, maxSpeed = 10, 150
 
 -- Aimbot Settings
@@ -22,25 +21,25 @@ local minFov, maxFov = 10, 200
 -- DRAG FUNCTION
 -- =======================
 local function makeDraggable(frame, dragHandle)
-	local draggingLocal = false
+	local dragging = false
 	local dragStart, startPos
 
 	dragHandle.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 
 			or input.UserInputType == Enum.UserInputType.Touch then
-			draggingLocal = true
+			dragging = true
 			dragStart = input.Position
 			startPos = frame.Position
 			input.Changed:Connect(function()
 				if input.UserInputState == Enum.UserInputState.End then
-					draggingLocal = false
+					dragging = false
 				end
 			end)
 		end
 	end)
 
 	dragHandle.InputChanged:Connect(function(input)
-		if draggingLocal and (input.UserInputType == Enum.UserInputType.MouseMovement 
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement 
 			or input.UserInputType == Enum.UserInputType.Touch) then
 			local delta = input.Position - dragStart
 			frame.Position = UDim2.new(
@@ -92,7 +91,7 @@ Instance.new("UICorner", textBox).CornerRadius = UDim.new(0, 8)
 
 makeDraggable(keyFrame, keyTitle)
 
--- Main Menu Frame
+-- Main Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 400, 0, 250)
 mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -102,26 +101,24 @@ mainFrame.Visible = false
 mainFrame.Parent = screenGui
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 15)
 
--- Kategorie-Leiste links
+-- Category Frame
 local categoryFrame = Instance.new("Frame")
 categoryFrame.Size = UDim2.new(0, 100, 1, 0)
 categoryFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 categoryFrame.Parent = mainFrame
 Instance.new("UICorner", categoryFrame).CornerRadius = UDim.new(0, 10)
 
--- Inhalt rechts
+-- Content Frame
 local contentFrame = Instance.new("Frame")
 contentFrame.Size = UDim2.new(1, -100, 1, 0)
-contentFrame.Position = UDim2.new(0, 100, 0, 35) -- unter die TopBar
+contentFrame.Position = UDim2.new(0, 100, 0, 35)
 contentFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 contentFrame.Parent = mainFrame
 Instance.new("UICorner", contentFrame).CornerRadius = UDim.new(0, 10)
 
 makeDraggable(mainFrame, categoryFrame)
 
--- =======================
--- TOP BAR MIT BUTTONS
--- =======================
+-- TopBar
 local topBar = Instance.new("Frame")
 topBar.Size = UDim2.new(1, 0, 0, 35)
 topBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
@@ -139,7 +136,7 @@ titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.Parent = topBar
 
--- Buttons
+-- Close Button
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(0, 35, 0, 35)
 closeButton.Position = UDim2.new(1, -35, 0, 0)
@@ -187,18 +184,105 @@ reopenIcon.Visible = false
 Instance.new("UICorner", reopenIcon).CornerRadius = UDim.new(1, 0)
 
 -- =======================
--- FLY TAB
+-- CATEGORY CONTENT
 -- =======================
--- (Dein Fly-Code bleibt hier wie gehabt, ich kürze wegen Platz)
+local flyContent = Instance.new("Frame")
+flyContent.Size = UDim2.new(1, 0, 1, 0)
+flyContent.BackgroundTransparency = 1
+flyContent.Parent = contentFrame
 
--- =======================
--- TROLL TAB
--- =======================
--- (Respawn-Button bleibt wie gehabt)
+-- Fly Button
+local flyToggle = Instance.new("TextButton")
+flyToggle.Size = UDim2.new(0.5, -10, 0, 40)
+flyToggle.Position = UDim2.new(0.05, 0, 0.1, 0)
+flyToggle.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+flyToggle.Text = "Fly: OFF"
+flyToggle.Font = Enum.Font.SourceSansBold
+flyToggle.TextSize = 22
+flyToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+flyToggle.Parent = flyContent
+Instance.new("UICorner", flyToggle).CornerRadius = UDim.new(0, 10)
 
--- =======================
--- AIMBOT TAB
--- =======================
+flyToggle.MouseButton1Click:Connect(function()
+	flying = not flying
+	flyToggle.Text = "Fly: " .. (flying and "ON" or "OFF")
+end)
+
+-- Speed Slider
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Size = UDim2.new(0.9, 0, 0, 30)
+speedLabel.Position = UDim2.new(0.05, 0, 0.35, 0)
+speedLabel.BackgroundTransparency = 1
+speedLabel.Text = "Speed: " .. flySpeed
+speedLabel.Font = Enum.Font.SourceSans
+speedLabel.TextSize = 20
+speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedLabel.Parent = flyContent
+
+local speedSlider = Instance.new("Frame")
+speedSlider.Size = UDim2.new(0.9, 0, 0, 20)
+speedSlider.Position = UDim2.new(0.05, 0, 0.5, 0)
+speedSlider.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+speedSlider.Parent = flyContent
+Instance.new("UICorner", speedSlider).CornerRadius = UDim.new(0, 10)
+
+local speedKnob = Instance.new("Frame")
+speedKnob.Size = UDim2.new(0, 20, 1, 0)
+speedKnob.Position = UDim2.new((flySpeed-minSpeed)/(maxSpeed-minSpeed), -10, 0, 0)
+speedKnob.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+speedKnob.Parent = speedSlider
+Instance.new("UICorner", speedKnob).CornerRadius = UDim.new(1, 0)
+
+local draggingSpeed = false
+local function updateSpeed(xPos)
+	local relative = math.clamp((xPos - speedSlider.AbsolutePosition.X) / speedSlider.AbsoluteSize.X, 0, 1)
+	flySpeed = math.floor(minSpeed + (maxSpeed - minSpeed) * relative)
+	speedKnob.Position = UDim2.new(relative, -10, 0, 0)
+	speedLabel.Text = "Speed: " .. flySpeed
+end
+
+speedSlider.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingSpeed = true
+		updateSpeed(input.Position.X)
+	end
+end)
+
+speedSlider.InputChanged:Connect(function(input)
+	if draggingSpeed and input.UserInputType == Enum.UserInputType.MouseMovement then
+		updateSpeed(input.Position.X)
+	end
+end)
+
+UIS.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingSpeed = false
+	end
+end)
+
+-- Player Content
+local playerContent = Instance.new("Frame")
+playerContent.Size = UDim2.new(1, 0, 1, 0)
+playerContent.BackgroundTransparency = 1
+playerContent.Visible = false
+playerContent.Parent = contentFrame
+
+local respawnBtn = Instance.new("TextButton")
+respawnBtn.Size = UDim2.new(0.5, -10, 0, 40)
+respawnBtn.Position = UDim2.new(0.05, 0, 0.1, 0)
+respawnBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+respawnBtn.Text = "Respawn"
+respawnBtn.Font = Enum.Font.SourceSansBold
+respawnBtn.TextSize = 22
+respawnBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+respawnBtn.Parent = playerContent
+Instance.new("UICorner", respawnBtn).CornerRadius = UDim.new(0, 10)
+
+respawnBtn.MouseButton1Click:Connect(function()
+	LocalPlayer:LoadCharacter()
+end)
+
+-- Aimbot Content
 local aimbotContent = Instance.new("Frame")
 aimbotContent.Size = UDim2.new(1, 0, 1, 0)
 aimbotContent.BackgroundTransparency = 1
@@ -290,10 +374,10 @@ local function createCategoryButton(name, yPos, callback)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(1, 0, 0, 50)
 	btn.Position = UDim2.new(0, 0, 0, yPos)
-	btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 	btn.Text = name
 	btn.Font = Enum.Font.SourceSansBold
-	btn.TextSize = 22
+	btn.TextSize = 18
 	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 	btn.Parent = categoryFrame
 	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
@@ -301,54 +385,52 @@ local function createCategoryButton(name, yPos, callback)
 	btn.MouseButton1Click:Connect(callback)
 end
 
-createCategoryButton("Fly", 35, function()
-	aimbotContent.Visible = false
+createCategoryButton("Fly", 0, function()
 	flyContent.Visible = true
-	trollContent.Visible = false
-end)
-
-createCategoryButton("Troll", 95, function()
+	playerContent.Visible = false
 	aimbotContent.Visible = false
-	flyContent.Visible = false
-	trollContent.Visible = true
 end)
 
-createCategoryButton("Aimbot", 155, function()
+createCategoryButton("Player", 50, function()
+	flyContent.Visible = false
+	playerContent.Visible = true
+	aimbotContent.Visible = false
+end)
+
+createCategoryButton("Aimbot", 100, function()
+	flyContent.Visible = false
+	playerContent.Visible = false
 	aimbotContent.Visible = true
-	flyContent.Visible = false
-	trollContent.Visible = false
 end)
 
 -- =======================
--- AIMBOT LOGIC (PC only)
+-- TOGGLE GUI
 -- =======================
-if not UIS.TouchEnabled then
-	RunService.RenderStepped:Connect(function()
-		if aimbotEnabled and UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
-			local camera = workspace.CurrentCamera
-			local closestTarget, closestDist = nil, fovValue
+closeButton.MouseButton1Click:Connect(function()
+	mainFrame.Visible = false
+	reopenIcon.Visible = true
+end)
 
-			for _, plr in pairs(Players:GetPlayers()) do
-				if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
-					local head = plr.Character.Head
-					local vector, onScreen = camera:WorldToViewportPoint(head.Position)
-					if onScreen then
-						local mousePos = UIS:GetMouseLocation()
-						local dist = (Vector2.new(vector.X, vector.Y) - mousePos).Magnitude
-						if dist < closestDist then
-							closestDist = dist
-							closestTarget = head
-						end
-					end
-				end
-			end
+reopenIcon.MouseButton1Click:Connect(function()
+	mainFrame.Visible = true
+	reopenIcon.Visible = false
+end)
 
-			if closestTarget then
-				camera.CFrame = CFrame.new(camera.CFrame.Position, closestTarget.Position)
-			end
-		end
-	end)
-end
+local minimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	if minimized then
+		mainFrame.Size = UDim2.new(0, 200, 0, 100)
+		categoryFrame.Visible = false
+		contentFrame.Visible = false
+		titleLabel.Text = "V1 Fly Gui"
+	else
+		mainFrame.Size = UDim2.new(0, 400, 0, 250)
+		categoryFrame.Visible = true
+		contentFrame.Visible = true
+		titleLabel.Text = "V1 Fly Gui"
+	end
+end)
 
 -- =======================
 -- KEY CHECK
@@ -359,3 +441,71 @@ textBox.FocusLost:Connect(function(enterPressed)
 		mainFrame.Visible = true
 	end
 end)
+
+-- =======================
+-- FLY LOGIC
+-- =======================
+RunService.RenderStepped:Connect(function()
+	if flying and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+		local root = LocalPlayer.Character.HumanoidRootPart
+		if not bv then
+			bv = Instance.new("BodyVelocity")
+			bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+			bv.Parent = root
+		end
+		if not bg then
+			bg = Instance.new("BodyGyro")
+			bg.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
+			bg.PARENT = root
+		end
+
+		local moveDir = Vector3.new()
+		if UIS:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + (workspace.CurrentCamera.CFrame.LookVector) end
+		if UIS:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - (workspace.CurrentCamera.CFrame.LookVector) end
+		if UIS:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - (workspace.CurrentCamera.CFrame.RightVector) end
+		if UIS:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + (workspace.CurrentCamera.CFrame.RightVector) end
+		if UIS:IsKeyDown(Enum.KeyCode.E) then moveDir = moveDir + Vector3.new(0,1,0) end
+		if UIS:IsKeyDown(Enum.KeyCode.Q) then moveDir = moveDir - Vector3.new(0,1,0) end
+
+		bv.Velocity = moveDir.Unit * flySpeed
+		bg.CFrame = workspace.CurrentCamera.CFrame
+	else
+		if bv then bv:Destroy() bv = nil end
+		if bg then bg:Destroy() bg = nil end
+	end
+end)
+
+-- =======================
+-- AIMBOT LOGIC
+-- =======================
+if not UIS.TouchEnabled then
+	local function getClosestPlayer()
+		local closestPlayer = nil
+		local shortestDistance = math.huge
+		local mouse = LocalPlayer:GetMouse()
+
+		for _, player in pairs(Players:GetPlayers()) do
+			if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+				local head = player.Character.Head
+				local pos, visible = workspace.CurrentCamera:WorldToViewportPoint(head.Position)
+				if visible then
+					local distance = (Vector2.new(mouse.X, mouse.Y) - Vector2.new(pos.X, pos.Y)).Magnitude
+					if distance < shortestDistance and distance <= fovValue then
+						shortestDistance = distance
+						closestPlayer = head
+					end
+				end
+			end
+		end
+		return closestPlayer
+	end
+
+	RunService.RenderStepped:Connect(function()
+		if aimbotEnabled and UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+			local target = getClosestPlayer()
+			if target then
+				workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, target.Position)
+			end
+		end
+	end)
+end
