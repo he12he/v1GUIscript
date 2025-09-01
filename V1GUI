@@ -1,5 +1,3 @@
--- LocalScript in StarterPlayerScripts
--- Key System + Kategorien Menü (Fly + Troll) + Rund + Drag&Drop
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
