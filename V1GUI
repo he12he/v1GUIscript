@@ -71,7 +71,7 @@ Instance.new("UICorner", keyFrame).CornerRadius = UDim.new(0, 15)
 local keyTitle = Instance.new("TextLabel")
 keyTitle.Size = UDim2.new(1, 0, 0, 50)
 keyTitle.BackgroundTransparency = 1
-keyTitle.Text = "Bitte Key eingeben"
+keyTitle.Text = "Please enter the key!"
 keyTitle.Font = Enum.Font.SourceSansBold
 keyTitle.TextSize = 22
 keyTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -82,7 +82,7 @@ textBox.Size = UDim2.new(0.8, 0, 0, 40)
 textBox.Position = UDim2.new(0.1, 0, 0.5, -20)
 textBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 textBox.Text = ""
-textBox.PlaceholderText = "Key eingeben..."
+textBox.PlaceholderText = "Key"
 textBox.TextScaled = true
 textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 textBox.Parent = keyFrame
@@ -327,12 +327,23 @@ end)
 textBox.FocusLost:Connect(function(enterPressed)
 	if enterPressed then
 		if textBox.Text == correctKey then
+			wait(0.5)
+			textBox.Text = "Loading."
+			wait(0.35)
+			textBox.Text = "Loading.."
+			wait(0.35)
+			textBox.Text = "Loading..."
+			wait(0.35)
+			textBox.Text = "Loaded!"
+			wait(0.23)
 			keyFrame.Visible = false
 			mainFrame.Visible = true
 			print("Key akzeptiert → Hauptmenü geöffnet!")
 		else
-			textBox.Text = ""
+			textBox.Text = "False Key!"
 			warn("Falscher Key!")
+			wait(5)
+			textBox.Text = ""
 		end
 	end
 end)
