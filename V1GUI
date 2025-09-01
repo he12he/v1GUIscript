@@ -1,4 +1,3 @@
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
@@ -108,12 +107,79 @@ Instance.new("UICorner", categoryFrame).CornerRadius = UDim.new(0, 10)
 -- Inhalt rechts
 local contentFrame = Instance.new("Frame")
 contentFrame.Size = UDim2.new(1, -100, 1, 0)
-contentFrame.Position = UDim2.new(0, 100, 0, 0)
+contentFrame.Position = UDim2.new(0, 100, 0, 35) -- unter die TopBar
 contentFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 contentFrame.Parent = mainFrame
 Instance.new("UICorner", contentFrame).CornerRadius = UDim.new(0, 10)
 
 makeDraggable(mainFrame, categoryFrame)
+
+-- =======================
+-- TOP BAR MIT BUTTONS
+-- =======================
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 35)
+topBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+topBar.Parent = mainFrame
+Instance.new("UICorner", topBar).CornerRadius = UDim.new(0, 10)
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -105, 1, 0)
+titleLabel.Position = UDim2.new(0, 5, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "V1 Fly Gui"
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextSize = 20
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = topBar
+
+-- Buttons
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 35, 0, 35)
+closeButton.Position = UDim2.new(1, -35, 0, 0)
+closeButton.Text = "X"
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.TextSize = 20
+closeButton.Parent = topBar
+Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 8)
+
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0, 35, 0, 35)
+minimizeButton.Position = UDim2.new(1, -70, 0, 0)
+minimizeButton.Text = "-"
+minimizeButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton.Font = Enum.Font.SourceSansBold
+minimizeButton.TextSize = 20
+minimizeButton.Parent = topBar
+Instance.new("UICorner", minimizeButton).CornerRadius = UDim.new(0, 8)
+
+local smallButton = Instance.new("TextButton")
+smallButton.Size = UDim2.new(0, 35, 0, 35)
+smallButton.Position = UDim2.new(1, -105, 0, 0)
+smallButton.Text = "▢"
+smallButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+smallButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+smallButton.Font = Enum.Font.SourceSansBold
+smallButton.TextSize = 20
+smallButton.Parent = topBar
+Instance.new("UICorner", smallButton).CornerRadius = UDim.new(0, 8)
+
+-- Reopen Icon
+local reopenIcon = Instance.new("TextButton")
+reopenIcon.Size = UDim2.new(0, 60, 0, 60)
+reopenIcon.Position = UDim2.new(0, 20, 1, -80)
+reopenIcon.BackgroundColor3 = Color3.fromRGB(50, 50, 200)
+reopenIcon.Text = "GUI"
+reopenIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
+reopenIcon.Font = Enum.Font.SourceSansBold
+reopenIcon.TextSize = 18
+reopenIcon.Parent = screenGui
+reopenIcon.Visible = false
+Instance.new("UICorner", reopenIcon).CornerRadius = UDim.new(1, 0)
 
 -- =======================
 -- FLY TAB
@@ -179,15 +245,20 @@ trollContent.BackgroundTransparency = 1
 trollContent.Visible = false
 trollContent.Parent = contentFrame
 
-local trollLabel = Instance.new("TextLabel")
-trollLabel.Size = UDim2.new(1, 0, 1, 0)
-trollLabel.BackgroundTransparency = 1
-trollLabel.Text = "in the next update available"
-trollLabel.Font = Enum.Font.SourceSansBold
-trollLabel.TextSize = 22
-trollLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-trollLabel.TextWrapped = true
-trollLabel.Parent = trollContent
+local respawnButton = Instance.new("TextButton")
+respawnButton.Size = UDim2.new(0.5, 0, 0, 50)
+respawnButton.Position = UDim2.new(0.25, 0, 0.4, 0)
+respawnButton.BackgroundColor3 = Color3.fromRGB(200, 80, 80)
+respawnButton.Text = "Respawn"
+respawnButton.Font = Enum.Font.SourceSansBold
+respawnButton.TextSize = 22
+respawnButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+respawnButton.Parent = trollContent
+Instance.new("UICorner", respawnButton).CornerRadius = UDim.new(0, 10)
+
+respawnButton.MouseButton1Click:Connect(function()
+	LocalPlayer:LoadCharacter()
+end)
 
 -- =======================
 -- CATEGORY BUTTONS
@@ -207,12 +278,12 @@ local function createCategoryButton(name, yPos, callback)
 	btn.MouseButton1Click:Connect(callback)
 end
 
-createCategoryButton("Fly", 0, function()
+createCategoryButton("Fly", 35, function()
 	flyContent.Visible = true
 	trollContent.Visible = false
 end)
 
-createCategoryButton("Troll", 60, function()
+createCategoryButton("Troll", 95, function()
 	flyContent.Visible = false
 	trollContent.Visible = true
 end)
@@ -320,28 +391,52 @@ UIS.InputEnded:Connect(function(input)
 end)
 
 -- =======================
+-- BUTTON FUNKTIONEN (X, -, ▢)
+-- =======================
+closeButton.MouseButton1Click:Connect(function()
+	mainFrame.Visible = false
+	reopenIcon.Visible = true
+end)
+
+reopenIcon.MouseButton1Click:Connect(function()
+	mainFrame.Visible = true
+	reopenIcon.Visible = false
+end)
+
+local minimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	if minimized then
+		contentFrame.Visible = false
+		categoryFrame.Visible = false
+	else
+		contentFrame.Visible = true
+		categoryFrame.Visible = true
+	end
+end)
+
+local smallMode = false
+smallButton.MouseButton1Click:Connect(function()
+	smallMode = not smallMode
+	if smallMode then
+		mainFrame.Size = UDim2.new(0, 200, 0, 100)
+		categoryFrame.Visible = false
+		contentFrame.Visible = false
+		titleLabel.Text = "V1 Fly Gui"
+	else
+		mainFrame.Size = UDim2.new(0, 400, 0, 250)
+		categoryFrame.Visible = true
+		contentFrame.Visible = true
+		titleLabel.Text = "V1 Fly Gui"
+	end
+end)
+
+-- =======================
 -- KEY CHECK
 -- =======================
 textBox.FocusLost:Connect(function(enterPressed)
-	if enterPressed then
-		if textBox.Text == correctKey then
-			wait(0.5)
-			textBox.Text = "Loading."
-			wait(0.35)
-			textBox.Text = "Loading.."
-			wait(0.35)
-			textBox.Text = "Loading..."
-			wait(0.35)
-			textBox.Text = "Loaded!"
-			wait(0.23)
-			keyFrame.Visible = false
-			mainFrame.Visible = true
-			print("Key akzeptiert → Hauptmenü geöffnet!")
-		else
-			textBox.Text = "False Key!"
-			warn("Falscher Key!")
-			wait(5)
-			textBox.Text = ""
-		end
+	if enterPressed and textBox.Text == correctKey then
+		keyFrame.Visible = false
+		mainFrame.Visible = true
 	end
 end)
