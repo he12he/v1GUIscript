@@ -670,6 +670,7 @@ keyBox.FocusLost:Connect(function(enter)
 				Text = nachricht,
 				Duration = 5,
 			})
+		setclipboard("https://discord.gg/genSNpBqrk")
 		else
 			keyBox.Text = ""
 			keyBox.PlaceholderText = "Wrong Key!"
