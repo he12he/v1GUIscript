@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
 
 -- =======================
 -- SETTINGS
@@ -16,6 +17,7 @@ local minSpeed, maxSpeed = 10, 150
 local aimbotEnabled = false
 local fovValue = 100
 local fovCircleEnabled = false
+local draggingSlider = false
 
 -- =======================
 -- DRAG FUNCTION
@@ -93,7 +95,7 @@ makeDraggable(keyFrame, keyTitle)
 
 -- Main Menu
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 400, 0, 250)
+mainFrame.Size = UDim2.new(0, 400, 0, 300)
 mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
@@ -102,23 +104,21 @@ mainFrame.Parent = screenGui
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 15)
 
 -- Top Bar
-local topBar = Instance.new("Frame")
+local topBar = Instance.new("Frame", mainFrame)
 topBar.Size = UDim2.new(1, 0, 0, 35)
 topBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-topBar.Parent = mainFrame
 
-local titleLabel = Instance.new("TextLabel")
+local titleLabel = Instance.new("TextLabel", topBar)
 titleLabel.Size = UDim2.new(1, -105, 1, 0)
-titleLabel.BackgroundTransparency = 1
+titleLabel.Position = UDim2.new(0, 10, 0, 0)
 titleLabel.Text = "V1 Fly Gui"
 titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.TextSize = 20
 titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.BackgroundTransparency = 1
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-titleLabel.Position = UDim2.new(0, 10, 0, 0)
-titleLabel.Parent = topBar
 
-local closeButton = Instance.new("TextButton")
+local closeButton = Instance.new("TextButton", topBar)
 closeButton.Size = UDim2.new(0, 35, 1, 0)
 closeButton.Position = UDim2.new(1, -35, 0, 0)
 closeButton.Text = "X"
@@ -126,9 +126,8 @@ closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
 closeButton.Font = Enum.Font.SourceSansBold
 closeButton.TextSize = 20
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.Parent = topBar
 
-local minimizeButton = Instance.new("TextButton")
+local minimizeButton = Instance.new("TextButton", topBar)
 minimizeButton.Size = UDim2.new(0, 35, 1, 0)
 minimizeButton.Position = UDim2.new(1, -70, 0, 0)
 minimizeButton.Text = "-"
@@ -136,20 +135,17 @@ minimizeButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 minimizeButton.Font = Enum.Font.SourceSansBold
 minimizeButton.TextSize = 20
 minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimizeButton.Parent = topBar
 
 -- Frames
-local categoryFrame = Instance.new("Frame")
+local categoryFrame = Instance.new("Frame", mainFrame)
 categoryFrame.Size = UDim2.new(0, 100, 1, -35)
 categoryFrame.Position = UDim2.new(0, 0, 0, 35)
 categoryFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-categoryFrame.Parent = mainFrame
 
-local contentFrame = Instance.new("Frame")
+local contentFrame = Instance.new("Frame", mainFrame)
 contentFrame.Size = UDim2.new(1, -100, 1, -35)
 contentFrame.Position = UDim2.new(0, 100, 0, 35)
 contentFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-contentFrame.Parent = mainFrame
 
 makeDraggable(mainFrame, topBar)
 
@@ -206,7 +202,7 @@ end)
 -- =======================
 -- FLY TAB
 -- =======================
-local flyButton = Instance.new("TextButton")
+local flyButton = Instance.new("TextButton", flyContent)
 flyButton.Size = UDim2.new(0.4,0,0,40)
 flyButton.Position = UDim2.new(0.05,0,0.05,0)
 flyButton.Text = "Aus"
@@ -214,7 +210,6 @@ flyButton.BackgroundColor3 = Color3.fromRGB(80,80,80)
 flyButton.Font = Enum.Font.SourceSansBold
 flyButton.TextSize = 20
 flyButton.TextColor3 = Color3.fromRGB(255,255,255)
-flyButton.Parent = flyContent
 Instance.new("UICorner",flyButton).CornerRadius = UDim.new(0,8)
 
 local sliderFrame = Instance.new("Frame",flyContent)
@@ -258,6 +253,52 @@ respawnButton.MouseButton1Click:Connect(function()
 end)
 
 -- =======================
+-- AIMBOT TAB
+-- =======================
+local aimbotButton = Instance.new("TextButton", aimbotContent)
+aimbotButton.Size = UDim2.new(0.4,0,0,40)
+aimbotButton.Position = UDim2.new(0.05,0,0.05,0)
+aimbotButton.Text = "Aimbot Aus"
+aimbotButton.BackgroundColor3 = Color3.fromRGB(80,80,80)
+aimbotButton.Font = Enum.Font.SourceSansBold
+aimbotButton.TextSize = 20
+aimbotButton.TextColor3 = Color3.fromRGB(255,255,255)
+Instance.new("UICorner",aimbotButton).CornerRadius = UDim.new(0,8)
+
+local fovSliderFrame = Instance.new("Frame", aimbotContent)
+fovSliderFrame.Size = UDim2.new(0.9,0,0,20)
+fovSliderFrame.Position = UDim2.new(0.05,0,0.3,0)
+fovSliderFrame.BackgroundColor3 = Color3.fromRGB(70,70,70)
+Instance.new("UICorner",fovSliderFrame).CornerRadius = UDim.new(0,10)
+
+local fovSliderButton = Instance.new("Frame", fovSliderFrame)
+fovSliderButton.Size = UDim2.new(0,20,1,0)
+fovSliderButton.Position = UDim2.new((fovValue-10)/(300-10),-10,0,0)
+fovSliderButton.BackgroundColor3 = Color3.fromRGB(0,255,0)
+Instance.new("UICorner",fovSliderButton).CornerRadius = UDim.new(1,0)
+
+local fovLabel = Instance.new("TextLabel", aimbotContent)
+fovLabel.Size = UDim2.new(1,0,0,30)
+fovLabel.Position = UDim2.new(0,0,0.45,0)
+fovLabel.Text = "FOV: "..fovValue
+fovLabel.TextColor3 = Color3.fromRGB(255,255,255)
+fovLabel.BackgroundTransparency = 1
+fovLabel.Font = Enum.Font.SourceSans
+fovLabel.TextSize = 20
+
+local fovCircle = Drawing.new("Circle")
+fovCircle.Thickness = 2
+fovCircle.NumSides = 50
+fovCircle.Radius = fovValue
+fovCircle.Filled = false
+fovCircle.Visible = false
+fovCircle.Color = Color3.fromRGB(0,255,0)
+
+RunService.RenderStepped:Connect(function()
+	fovCircle.Position = UIS:GetMouseLocation()
+end)
+
+-- =======================
 -- MINIMIZE SYSTEM
 -- =======================
 local minimized = false
@@ -271,7 +312,7 @@ minimizeButton.MouseButton1Click:Connect(function()
 	else
 		categoryFrame.Visible = true
 		contentFrame.Visible = true
-		mainFrame.Size = UDim2.new(0,400,0,250)
+		mainFrame.Size = UDim2.new(0,400,0,300)
 		minimizeButton.Text = "-"
 		minimized = false
 	end
@@ -341,7 +382,7 @@ end)
 LocalPlayer.CharacterAdded:Connect(stopFly)
 
 -- =======================
--- SLIDER SYSTEM
+-- SLIDER SYSTEM (Fly)
 -- =======================
 local function updateSpeedFromX(xPos)
 	local relative=math.clamp((xPos-sliderFrame.AbsolutePosition.X)/sliderFrame.AbsoluteSize.X,0,1)
@@ -371,23 +412,91 @@ UIS.InputEnded:Connect(function(input)
 end)
 
 -- =======================
--- KEY CHECK
+-- SLIDER SYSTEM (Aimbot)
+-- =======================
+local function updateFovFromX(xPos)
+	local relative=math.clamp((xPos-fovSliderFrame.AbsolutePosition.X)/fovSliderFrame.AbsoluteSize.X,0,1)
+	local newFov=math.floor(10+(300-10)*relative)
+	fovValue=newFov
+	fovSliderButton.Position=UDim2.new(relative,-10,0,0)
+	fovLabel.Text="FOV: "..fovValue
+	fovCircle.Radius=fovValue
+end
+
+fovSliderFrame.InputBegan:Connect(function(input)
+	if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+		draggingSlider=true
+		updateFovFromX(input.Position.X)
+	end
+end)
+
+fovSliderFrame.InputChanged:Connect(function(input)
+	if draggingSlider and (input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch) then
+		updateFovFromX(input.Position.X)
+	end
+end)
+
+UIS.InputEnded:Connect(function(input)
+	if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+		draggingSlider=false
+	end
+end)
+
+-- =======================
+-- AIMBOT SYSTEM
+-- =======================
+local holding=false
+UIS.InputBegan:Connect(function(input,gp)
+	if gp then return end
+	if input.UserInputType==Enum.UserInputType.MouseButton2 or input.UserInputType==Enum.UserInputType.Touch then
+		holding=true
+	end
+end)
+UIS.InputEnded:Connect(function(input)
+	if input.UserInputType==Enum.UserInputType.MouseButton2 or input.UserInputType==Enum.UserInputType.Touch then
+		holding=false
+	end
+end)
+
+aimbotButton.MouseButton1Click:Connect(function()
+	aimbotEnabled=not aimbotEnabled
+	aimbotButton.Text= aimbotEnabled and "Aimbot An" or "Aimbot Aus"
+	fovCircle.Visible=aimbotEnabled
+end)
+
+RunService.RenderStepped:Connect(function()
+	if aimbotEnabled and holding then
+		local closest,dist
+		for _,plr in pairs(Players:GetPlayers()) do
+			if plr~=LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
+				local pos,visible=Camera:WorldToViewportPoint(plr.Character.Head.Position)
+				if visible then
+					local mLoc=UIS:GetMouseLocation()
+					local mag=(Vector2.new(pos.X,pos.Y)-mLoc).Magnitude
+					if mag<=fovValue and (not dist or mag<dist) then
+						closest=plr.Character.Head
+						dist=mag
+					end
+				end
+			end
+		end
+		if closest then
+			Camera.CFrame=CFrame.new(Camera.CFrame.Position,closest.Position)
+		end
+	end
+end)
+
+-- =======================
+-- KEY SYSTEM
 -- =======================
 textBox.FocusLost:Connect(function(enterPressed)
 	if enterPressed then
 		if textBox.Text==correctKey then
-			textBox.Text="Loading."
-			wait(0.45)
-			textBox.Text="Loading.."
-			wait(0.45)
-			textBox.Text="Loading..."
-			wait(0.45)
 			keyFrame.Visible=false
 			mainFrame.Visible=true
 		else
-			textBox.Text="False Key!"
-			wait(2)
 			textBox.Text=""
+			textBox.PlaceholderText="Wrong Key!"
 		end
 	end
 end)
