@@ -377,11 +377,11 @@ textBox.FocusLost:Connect(function(enterPressed)
 	if enterPressed then
 		if textBox.Text==correctKey then
 			textBox.Text="Loading."
-			wait(0.3)
+			wait(0.45)
 			textBox.Text="Loading.."
-			wait(0.3)
+			wait(0.45)
 			textBox.Text="Loading..."
-			wait(0.3)
+			wait(0.45)
 			keyFrame.Visible=false
 			mainFrame.Visible=true
 		else
